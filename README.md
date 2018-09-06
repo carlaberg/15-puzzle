@@ -1,1 +1,1 @@
-# boilerplate-basic-react
+# React 15-puzzle
