@@ -27,14 +27,14 @@ class helpers {
   }
   
   getCoordinates(rows, cols) {
-      if(window.innerWidth < mobile) {
-        rows = (rows * cols) / 4;
-        cols = 4;
-      }
-      
-      let xOffset = 0;
-      let yOffset = 0;
-      console.log(this);
+    if(window.innerWidth < mobile) {
+      rows = (rows * cols) / 4;
+      cols = 4;
+    }
+    
+    let xOffset = 0;
+    let yOffset = 0;
+    
     return Array.from(Array(rows * cols).keys()).map(n => {
         if(n === 0) {
           return [this.getTileWidth() * xOffset, this.getTileWidth() * yOffset];

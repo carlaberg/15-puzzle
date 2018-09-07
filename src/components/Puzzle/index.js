@@ -4,13 +4,14 @@ import { shuffle } from '../../utils';
 import helpers from './helpers';
 import { mobile } from '../../style/breakpoints';
 const puzzleHelpers = new helpers();
+import Timer from '../../lib/Timer';
 import Tile from '../Tile';
 import Modal from '../Modal';
 
 class Puzzle extends Component {
   constructor(props) {
     super(props);
-    
+
     this.state = {
       positions: shuffle(Array.from(Array(props.rows * props.columns).keys())),
       coordinates: puzzleHelpers.getCoordinates(props.rows, props.columns),
@@ -19,8 +20,15 @@ class Puzzle extends Component {
       showModal: false
     };
     
+    this.timer = new Timer();
+    this.timeElement = React.createRef();
     this.updateBoard = this.updateBoard.bind(this);
     this.onWin = this.onWin.bind(this);
+  }
+  
+  componentDidMount() {
+    const timeEl = this.timeElement.current;
+    this.timer.start(() => this.timer.printTime(this.timeElement.current));
   }
   
   newGame() {
@@ -30,6 +38,9 @@ class Puzzle extends Component {
       time: 0,
       moves: 0
     });
+    
+    this.timer.stop();
+    this.timer.start(() => this.timer.printTime(this.timeElement.current));
   }
   
   layOutTiles() {
@@ -78,6 +89,8 @@ class Puzzle extends Component {
     const colCount = window.innerWidth < mobile ? 4 : columns;
     
     if(distance == 1 || distance == colCount) {
+      
+      if((clickedIndex + 1) % colCount == 0 && (emptyIndex + 1) % colCount == 1) return;
       positions[emptyIndex] = parseInt(e.target.getAttribute('data-id'));
       positions[clickedIndex] = positions.length - 1;
       this.setState(state => ({ 
@@ -92,13 +105,13 @@ class Puzzle extends Component {
   render() {
     const { columns, rows } = this.props;
     const { time, moves, showModal } = this.state;
-    console.log(puzzleHelpers.getTileWidth);
+    
     return (
       <Fragment>
         <PuzzleHeader>
           <Title>15 Puzzle</Title>
           <GameStats width={ this.puzzleWidth } height={ this.puzzleHeight}>
-            <div>Time: { time }</div>
+            <div>Time: <span ref={ this.timeElement } /></div>
             <div>Moves: { moves }</div>
           </GameStats>
         </PuzzleHeader>
@@ -121,7 +134,7 @@ class Puzzle extends Component {
               <NewGameButton onClick={ () => this.newGame() } background='#42434F'>New Game</NewGameButton>
             </Fragment>
           )}
-        </Modal>  
+        </Modal>
       </Fragment>
     )
   }
