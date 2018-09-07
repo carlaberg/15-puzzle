@@ -4,7 +4,8 @@
   "description": "Simple boilerplate for testing stuff",
   "main": "webpack.config.js",
   "scripts": {
-    "dev": "webpack-dev-server --open --mode=development"
+    "dev": "webpack-dev-server --open --mode=development",
+    "build": "webpack --mode=production"
   },
   "author": "Carl Åberg",
   "license": "ISC",
