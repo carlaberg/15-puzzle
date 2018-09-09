@@ -6,10 +6,6 @@ export const PuzzleContainer = styled.div`
   height: ${props => props.height + 'px'};
   margin: 30px 0;
   flex-shrink: 0;
-  
-  @media (min-width: ${ desktop + 'px'}) {
-    margin: 120px 0 30px;
-  }
 `
 
 export const PuzzleHeader = styled.div`
