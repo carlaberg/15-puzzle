@@ -13,7 +13,8 @@ class Puzzle extends Component {
     super(props);
 
     this.state = {
-      positions: shuffle(Array.from(Array(props.rows * props.columns).keys())),
+      // positions: shuffle(Array.from(Array(props.rows * props.columns).keys())),
+      positions: Array.from(Array(props.rows * props.columns).keys()),
       coordinates: puzzleHelpers.getCoordinates(props.rows, props.columns),
       time: 0,
       moves: 0,
@@ -39,6 +40,7 @@ class Puzzle extends Component {
       moves: 0
     });
     
+    this.timeElement.current.innerHTML = '0m 0s';
     this.timer.stop();
     this.timer.start(() => this.timer.printTime(this.timeElement.current));
   }
@@ -76,11 +78,11 @@ class Puzzle extends Component {
   }
   
   onWin() {
-    this.setState({ showModal: true });
+    this.setState({ showModal: true, time: this.timer.getTime() });
   }
   
   updateBoard(e) {
-    const { positions } = this.state;
+    const { positions, coordinates } = this.state;
     const { columns } = this.props;
     
     const clickedIndex = positions.indexOf(parseInt(e.target.getAttribute('data-id')));
@@ -89,8 +91,8 @@ class Puzzle extends Component {
     const colCount = window.innerWidth < mobile ? 4 : columns;
     
     if(distance == 1 || distance == colCount) {
-      
-      if((clickedIndex + 1) % colCount == 0 && (emptyIndex + 1) % colCount == 1) return;
+      const matches = coordinates[clickedIndex].filter((item, index) => item === coordinates[emptyIndex][index]);
+      if(matches.length === 0) return;
       positions[emptyIndex] = parseInt(e.target.getAttribute('data-id'));
       positions[clickedIndex] = positions.length - 1;
       this.setState(state => ({ 
@@ -111,7 +113,7 @@ class Puzzle extends Component {
         <PuzzleHeader>
           <Title>15 Puzzle</Title>
           <GameStats width={ this.puzzleWidth } height={ this.puzzleHeight}>
-            <div>Time: <span ref={ this.timeElement } /></div>
+            <div>Time: <span ref={ this.timeElement }>0m 0s</span></div>
             <div>Moves: { moves }</div>
           </GameStats>
         </PuzzleHeader>
@@ -127,7 +129,7 @@ class Puzzle extends Component {
           {() => (
             <Fragment>
               <WinMessage>You won!</WinMessage>
-              <GameStats width={ this.puzzleWidth } height={ this.puzzleHeight}>
+              <GameStats width={ this.puzzleWidth } height={ this.puzzleHeight }>
                 <div style={{textAlign: 'center'}}>Time: { time }</div>
                 <div style={{textAlign: 'center'}}>Moves: { moves }</div>
               </GameStats>

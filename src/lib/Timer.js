@@ -7,7 +7,7 @@ class Timer {
   start(callback) {
     this.interval = setInterval(() => {
       this.elapsedTime++
-      callback(this.elapsedTime);
+      callback();
     }, 1000);
   }
   
@@ -40,8 +40,14 @@ class Timer {
     }
   }
   
+  getTime() {
+    return this.getMinutes() + 'm' + ' ' + this.getSeconds() + 's';
+  }
+  
   printTime(el) {
-    el.innerHTML = this.getMinutes() + 'm' + ' ' + this.getSeconds() + 's';
+    if(el) {
+      el.innerHTML = this.getMinutes() + 'm' + ' ' + this.getSeconds() + 's';
+    }
   }
 }
 
