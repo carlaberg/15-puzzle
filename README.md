@@ -1,4 +1,4 @@
-# React 15-puzzle
+# React 15-puzzle #
 This is a version of the classic 15 puzzle game built with react och styled components.
 ---
 ### How to run locally
