@@ -13,8 +13,7 @@ class Puzzle extends Component {
     super(props);
 
     this.state = {
-      // positions: shuffle(Array.from(Array(props.rows * props.columns).keys())),
-      positions: Array.from(Array(props.rows * props.columns).keys()),
+      positions: shuffle(Array.from(Array(props.rows * props.columns).keys())),
       coordinates: puzzleHelpers.getCoordinates(props.rows, props.columns),
       time: 0,
       moves: 0,
