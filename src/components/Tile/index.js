@@ -9,7 +9,7 @@ const Tile = ({ position, empty, clickHandler, coordinates }) => {
       onClick={ clickHandler } 
       data-id={ position }>
       <TileContent>
-        { position + 1 }        
+        { position }        
       </TileContent>
     </TileWrapper>
   )

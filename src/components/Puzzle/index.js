@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { PuzzleContainer, GameStats, PuzzleHeader, Title, NewGameButton, WinMessage } from './styles';
-import { shuffle } from '../../utils';
+import { shuffle, countInversions } from '../../utils';
 import helpers from './helpers';
 import { mobile } from '../../style/breakpoints';
 const puzzleHelpers = new helpers();
@@ -48,7 +48,7 @@ class Puzzle extends Component {
     const { positions, coordinates } = this.state;
     return positions.map((item, index) => {
       
-      if(index === (positions.length - 1)) {
+      if(index === 0) {
         return (
             <Tile 
               empty={ true } 
@@ -72,8 +72,7 @@ class Puzzle extends Component {
   
   isWin() {
     const { positions } = this.state;
-    const nonMatches = positions.filter((value, index) => value !== index);
-    if(nonMatches.length === 0) return true;
+    return countInversions(positions) === 0 && positions[positions.length - 1] === 0;
   }
   
   onWin() {
@@ -85,7 +84,8 @@ class Puzzle extends Component {
     const { columns } = this.props;
     
     const clickedIndex = positions.indexOf(parseInt(e.target.getAttribute('data-id')));
-    const emptyIndex = positions.indexOf(positions.length - 1);
+    const emptyIndex = positions.indexOf(0);
+    
     const distance = Math.abs(clickedIndex - emptyIndex);
     const colCount = window.innerWidth < mobile ? 4 : columns;
     
@@ -93,7 +93,7 @@ class Puzzle extends Component {
       const matches = coordinates[clickedIndex].filter((item, index) => item === coordinates[emptyIndex][index]);
       if(matches.length === 0) return;
       positions[emptyIndex] = parseInt(e.target.getAttribute('data-id'));
-      positions[clickedIndex] = positions.length - 1;
+      positions[clickedIndex] = 0;
       this.setState(state => ({ 
         positions,
         moves: state.moves + 1
