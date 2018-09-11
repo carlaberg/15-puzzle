@@ -2,6 +2,9 @@ import { mobile } from '../style/breakpoints';
 import config from '../config';
 
 class Game {
+  constructor(props) {
+    this.columns = props.columns;
+  }
   shuffle(array) {
     while(true) {
       for (var i = array.length - 1; i > 0; i--) {
@@ -92,18 +95,45 @@ class Game {
     let yOffset = 0;
     
     return Array.from(Array(rows * cols).keys()).map(n => {
-        if(n === 0) {
-          return [this.getTileWidth() * xOffset, this.getTileWidth() * yOffset];
-        } else if(n % cols === 0) {
-          xOffset = 0;
-          yOffset++;
-        } else {
-          xOffset++;
-        }
-        
+      if(n === 0) {
         return [this.getTileWidth() * xOffset, this.getTileWidth() * yOffset];
+      } else if(n % cols === 0) {
+        xOffset = 0;
+        yOffset++;
+      } else {
+        xOffset++;
+      }
+        
+      return [this.getTileWidth() * xOffset, this.getTileWidth() * yOffset];
         
     });
+  }
+  
+  checkIfMovable(e, positions, coordinates, callback) {
+    const clickedIndex = positions.indexOf(parseInt(e.target.getAttribute('data-id')));
+    const emptyIndex = positions.indexOf(0);
+    
+    const distance = Math.abs(clickedIndex - emptyIndex);
+    const colCount = window.innerWidth < mobile ? 4 : this.columns;
+    
+    if(distance == 1 || distance == colCount) {
+      const matches = coordinates[clickedIndex].filter((item, index) => item === coordinates[emptyIndex][index]);
+      if(matches.length === 0) return false;
+      positions[emptyIndex] = parseInt(e.target.getAttribute('data-id'));
+      positions[clickedIndex] = 0;
+      
+      return positions;
+    } else {
+      return false;
+    }
+  }
+  
+  isWin(positions) {
+    return this.countInversions(positions) === 0 && positions[positions.length - 1] === 0;
+  }
+  
+  onWin(callback) {
+    if(typeof callback === 'function') callback();
   }
 }
 

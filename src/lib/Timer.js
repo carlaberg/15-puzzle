@@ -7,7 +7,7 @@ class Timer {
   start(callback) {
     this.interval = setInterval(() => {
       this.elapsedTime++
-      callback();
+      if(typeof callback === 'function') callback();
     }, 1000);
   }
   

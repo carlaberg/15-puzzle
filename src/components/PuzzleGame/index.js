@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 import { PuzzleContainer, GameStats, PuzzleHeader, Title, NewGameButton, WinMessage } from './styles';
 import { mobile } from '../../style/breakpoints';
 import Game from '../../lib/Game';
-const Puzzle = new Game();
 import Timer from '../../lib/Timer';
 import Tile from '../Tile';
 import Modal from '../Modal';
@@ -10,19 +9,19 @@ import Modal from '../Modal';
 class PuzzleGame extends Component {
   constructor(props) {
     super(props);
-
+    
+    this.puzzle = new Game(props);
+    this.timer = new Timer();
+    this.timeElement = React.createRef();
+    this.handleTileClick = this.handleTileClick.bind(this);
+    
     this.state = {
-      positions: Puzzle.shuffle(Array.from(Array(props.rows * props.columns).keys())),
-      coordinates: Puzzle.getCoordinates(props.rows, props.columns),
+      positions: this.puzzle.shuffle(Array.from(Array(props.rows * props.columns).keys())),
+      coordinates: this.puzzle.getCoordinates(props.rows, props.columns),
       time: 0,
       moves: 0,
       showModal: false
     };
-    
-    this.timer = new Timer();
-    this.timeElement = React.createRef();
-    this.updateBoard = this.updateBoard.bind(this);
-    this.onWin = this.onWin.bind(this);
   }
   
   componentDidMount() {
@@ -33,7 +32,7 @@ class PuzzleGame extends Component {
   newGame() {
     const { rows, columns } = this.props;
     this.setState({
-      positions: Puzzle.shuffle(Array.from(Array(rows * columns).keys())),
+      positions: this.puzzle.shuffle(Array.from(Array(rows * columns).keys())),
       time: 0,
       moves: 0
     });
@@ -50,7 +49,7 @@ class PuzzleGame extends Component {
       if(index === 0) {
         return (
             <Tile 
-              empty={ true } 
+              empty={ true }
               key={ index } 
               position={ index } 
               coordinates={ coordinates[positions.indexOf(index)] } 
@@ -61,7 +60,7 @@ class PuzzleGame extends Component {
           <Tile 
             key={ index } 
             position={ index } 
-            clickHandler={ this.updateBoard } 
+            clickHandler={ this.handleTileClick } 
             coordinates={ coordinates[positions.indexOf(index)] }
           />
         )
@@ -69,36 +68,17 @@ class PuzzleGame extends Component {
     }); 
   }
   
-  isWin() {
-    const { positions } = this.state;
-    return Puzzle.countInversions(positions) === 0 && positions[positions.length - 1] === 0;
-  }
-  
-  onWin() {
-    this.setState({ showModal: true, time: this.timer.getTime() });
-  }
-  
-  updateBoard(e) {
+  handleTileClick(e) {
     const { positions, coordinates } = this.state;
-    const { columns } = this.props;
     
-    const clickedIndex = positions.indexOf(parseInt(e.target.getAttribute('data-id')));
-    const emptyIndex = positions.indexOf(0);
-    
-    const distance = Math.abs(clickedIndex - emptyIndex);
-    const colCount = window.innerWidth < mobile ? 4 : columns;
-    
-    if(distance == 1 || distance == colCount) {
-      const matches = coordinates[clickedIndex].filter((item, index) => item === coordinates[emptyIndex][index]);
-      if(matches.length === 0) return;
-      positions[emptyIndex] = parseInt(e.target.getAttribute('data-id'));
-      positions[clickedIndex] = 0;
-      this.setState(state => ({ 
-        positions,
-        moves: state.moves + 1
-      }), () => {
-        if(this.isWin()) this.onWin();
-      });
+    const newPositions = this.puzzle.checkIfMovable(e, positions, coordinates);
+    if(!newPositions) return;
+    this.setState(state => ({ 
+      positions: newPositions,
+      moves: state.moves + 1
+    }));
+    if(this.puzzle.isWin(positions)) {
+      this.puzzle.onWin(() => this.setState({ showModal: true, time: this.timer.getTime() }));
     }
   }
   
@@ -117,8 +97,8 @@ class PuzzleGame extends Component {
         </PuzzleHeader>
         <PuzzleContainer 
           columns={ columns } 
-          width={ Puzzle.getPuzzleWidth(columns) } 
-          height={ Puzzle.getPuzzleHeight(rows, columns) }
+          width={ this.puzzle.getPuzzleWidth(columns) } 
+          height={ this.puzzle.getPuzzleHeight(rows, columns) }
         >
           {this.layOutTiles()}
         </PuzzleContainer>
