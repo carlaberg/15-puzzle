@@ -1,20 +1,19 @@
 import React, { Component, Fragment } from 'react';
 import { PuzzleContainer, GameStats, PuzzleHeader, Title, NewGameButton, WinMessage } from './styles';
-import { shuffle, countInversions } from '../../utils';
-import helpers from './helpers';
 import { mobile } from '../../style/breakpoints';
-const puzzleHelpers = new helpers();
+import Game from '../../lib/Game';
+const Puzzle = new Game();
 import Timer from '../../lib/Timer';
 import Tile from '../Tile';
 import Modal from '../Modal';
 
-class Puzzle extends Component {
+class PuzzleGame extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      positions: shuffle(Array.from(Array(props.rows * props.columns).keys())),
-      coordinates: puzzleHelpers.getCoordinates(props.rows, props.columns),
+      positions: Puzzle.shuffle(Array.from(Array(props.rows * props.columns).keys())),
+      coordinates: Puzzle.getCoordinates(props.rows, props.columns),
       time: 0,
       moves: 0,
       showModal: false
@@ -34,7 +33,7 @@ class Puzzle extends Component {
   newGame() {
     const { rows, columns } = this.props;
     this.setState({
-      positions: shuffle(Array.from(Array(rows * columns).keys())),
+      positions: Puzzle.shuffle(Array.from(Array(rows * columns).keys())),
       time: 0,
       moves: 0
     });
@@ -72,7 +71,7 @@ class Puzzle extends Component {
   
   isWin() {
     const { positions } = this.state;
-    return countInversions(positions) === 0 && positions[positions.length - 1] === 0;
+    return Puzzle.countInversions(positions) === 0 && positions[positions.length - 1] === 0;
   }
   
   onWin() {
@@ -118,8 +117,8 @@ class Puzzle extends Component {
         </PuzzleHeader>
         <PuzzleContainer 
           columns={ columns } 
-          width={ puzzleHelpers.getPuzzleWidth(columns) } 
-          height={ puzzleHelpers.getPuzzleHeight(rows, columns) }
+          width={ Puzzle.getPuzzleWidth(columns) } 
+          height={ Puzzle.getPuzzleHeight(rows, columns) }
         >
           {this.layOutTiles()}
         </PuzzleContainer>
@@ -141,4 +140,4 @@ class Puzzle extends Component {
   }
 }
 
-export default Puzzle;
+export default PuzzleGame;
