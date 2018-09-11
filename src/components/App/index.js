@@ -6,7 +6,7 @@ class App extends Component {
   render() {
     return (
       <SiteContainer>
-        <PuzzleGame rows={2} columns={2}/>
+        <PuzzleGame rows={4} columns={4}/>
       </SiteContainer>
     ) 
   }
